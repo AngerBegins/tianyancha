@@ -7,7 +7,7 @@ from setting import UA
 import os
 from scrapy.selector import Selector
 
-from tool.db.database import mysql
+from tool.db.database import mysql, mongo
 from tool.yanzheng.dianzi_chaojiying import dianzi
 # from tool.yanzheng.yanzheng import crack
 
@@ -215,9 +215,13 @@ class tanyancha(object):
         for company in company_name_url:
             name = company.split('_')[0]
             url = company.split('_')[1]
+            #插入mysql
             id = re.search('company/(\d+)', url).group(1)
             sql = 'insert into company values ("{}","{}","{}")'
             mysql.insert(sql.format(id,name,url))
+            #插入mongodb
+            mongo.insert({'_id':id,'name':name,'url':url})
+
 
 
     def next_page(self,url):
