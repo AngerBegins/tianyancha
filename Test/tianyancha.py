@@ -4,6 +4,7 @@ from scrapy.selector import Selector
 import json
 
 from setting import UA
+from tool.db.database import mongo
 from tool.yanzheng.dianzi_chaojiying import dianzi
 import random
 
@@ -73,18 +74,26 @@ class CompanyDetial:
             company['fanwei'] = selector.xpath('//td[text()="经营范围"]/following-sibling::td[1]//div/text()').extract_first()
 
             #股东信息
-            gudong_name = selector.xpath('//a[@tyc-event-ch="CompangyDetail.gudong.ziranren"]/text()').extract()
-            money_proportion =selector.xpath('//*[@id="_container_holder"]/table/tbody/tr/td[3]/div/div/span/text()').extract()
-            money_num =selector.xpath('//*[@id="_container_holder"]/table/tbody/tr/td[4]/div/span/text()').extract()
-            date =selector.xpath('//*[@id="_container_holder"]/table/tbody/tr/td[5]/div/span/text()').extract()
-            gudong = [{'name': i, 'money_proportion': j, 'money_num': k, 'date': m} for i, j, k, m in zip(gudong_name, money_proportion, money_num, date)]
+            gudong = {}
+            gudong['id'] = selector.xpath('')
+            gudong['name'] = selector.xpath('//a[@tyc-event-ch="CompangyDetail.gudong.ziranren"]/text()').extract()
+            gudong['proportion'] =selector.xpath('//*[@id="_container_holder"]/table/tbody/tr/td[3]/div/div/span/text()').extract()
+            gudong['money'] =selector.xpath('//*[@id="_container_holder"]/table/tbody/tr/td[4]/div/span/text()').extract()
+            gudong['date'] =selector.xpath('//*[@id="_container_holder"]/table/tbody/tr/td[5]/div/span/text()').extract()
+
 
             #主要人员
-            main_name = selector.xpath('//*[@id="_container_staff"]/div/table/tbody/tr/td[2]/div/div[2]/a/text()').extract()
-            position = selector.xpath('//*[@id="_container_staff"]/div/table/tbody/tr/td[3]/span/text()').extract()
+            person = {}
+            person['id'] = selector.xpath('//*[@id="_container_staff"]/div/table/tbody/tr/td[2]/div/div[2]/a/@href').extract()
+            person['name'] = selector.xpath('//*[@id="_container_staff"]/div/table/tbody/tr/td[2]/div/div[2]/a/text()').extract()
+            person['position'] = selector.xpath('//*[@id="_container_staff"]/div/table/tbody/tr/td[3]/span/text()').extract()
 
 
         return company, gudong
+
+    def insert_db(self):
+        mongo.insert()
+
 if __name__ == '__main__':
     company =CompanyDetial()
     count=0
