@@ -174,7 +174,7 @@ class Crack():
                     return left
         return left
 
-    def get_track(self, distance):
+    def get_track1(self, distance):
         track = []
         for _ in range(random.choice([6,7,8])):
             if sum(track) >distance:
@@ -185,7 +185,7 @@ class Crack():
                 return track
             track.append(random.choice([4, 5, 3,3]))
 
-    def get_track1(self, distance):
+    def get_track(self, distance):
         """
         根据偏移量获取移动轨迹
         :param distance: 偏移量
@@ -245,14 +245,13 @@ class Crack():
         for x in track:
 
             ActionChains(self.browser).move_by_offset(xoffset=x, yoffset=0).perform()
-            time.sleep(random.choice([0.02,0.03,0.02,0.04]))
+            # time.sleep(random.choice([0.02,0.03,0.02,0.04]))
         time.sleep(0.5)
         ActionChains(self.browser).release().perform()
 
     def crack(self):
         # 打开浏览器
         self.open()
-
         # 保存的图片名字
         bg_filename = 'bg.jpg'
         fullbg_filename = 'fullbg.jpg'
@@ -276,10 +275,32 @@ class Crack():
         slider = self.get_slider()
         # 拖动滑块到缺口处
         self.move_to_gap(slider, track)
+        time.sleep(3)
         print(self.browser.current_url)
         print(self.browser.get_cookies())
-        if self.browser.current_url == 'https://www.tianyancha.com/login':
-            return self.crack()
+        while self.browser.current_url == 'https://www.tianyancha.com/login':
+            bg_location_list, fullbg_location_list = self.get_images(bg_filename, fullbg_filename)
+
+            # 根据位置对图片进行合并还原
+            bg_img = self.get_merge_image(bg_filename, bg_location_list)
+            fullbg_img = self.get_merge_image(fullbg_filename, fullbg_location_list)
+
+            # 获取缺口位置
+            gap = self.get_gap(fullbg_img, bg_img)
+            print('缺口位置', gap)
+
+            track = self.get_track(gap - self.BORDER)
+            print('滑动滑块')
+            print(track)
+
+            # 点按呼出缺口
+            slider = self.get_slider()
+            # 拖动滑块到缺口处
+            self.move_to_gap(slider, track)
+            time.sleep(3)
+            print(self.browser.current_url)
+            print(self.browser.get_cookies())
+            #return self.crack()
         cookies = self.browser.get_cookies()
         cookie = [item['name'] +'='+ item['value'] for item in cookies]
         cookie = '; '.join(cookie)

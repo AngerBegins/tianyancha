@@ -309,7 +309,7 @@ class tanyancha(object):
                 if response.url.startswith('https://www.tianyancha.com/login'):
                     logger.info("cookie失效,重新模拟登录获取cookie")
                     # self.cookie = crack.crack()
-                    return self.make_request(url)
+                    # return self.make_request(url)
                 if response.url.startswith('https://antirobot.tianyancha.com/captcha/verify'):
                     logger.info("出现点字验证吗")
                     state = dianzi(response.url,self.cookie)
